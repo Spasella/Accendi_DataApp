@@ -8,7 +8,8 @@ import time
 import base64
 import io
 import time
-import re
+import requests
+import json
 
 import dash
 import dash_bootstrap_components as dbc
@@ -276,7 +277,8 @@ def formatting_consumption_data(dataset):
 # - UPDATE SU GCP
 def gcp_update_tab_consumi(df):
     # Imposta il percorso del file JSON di credenziali
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "solar-api-399515-da9f8b1998a8.json"
+
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/etc/secrets/solar-api-399515-da9f8b1998a8.json"
     print(df.columns)
     # Crea un client BigQuery
     client = bigquery.Client()
