@@ -38,6 +38,3 @@ Per eseguire la dashboard:
 
 Ogni contributo alla dashboard è benvenuto. Sentiti libero di forkare il progetto, aprire issue e inviare pull request.
 
-## Licenza
-
-Questo progetto è distribuito sotto la licenza MIT.
