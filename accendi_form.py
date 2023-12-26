@@ -411,8 +411,9 @@ def report_subplot(df):
 
 
 
-# Inizializza l'applicazione Dash con il tema Bootstrap
+# Inizializza l'applicazione Dash
 app = dash.Dash(__name__)
+server = app.server
 
 
 
