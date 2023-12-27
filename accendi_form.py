@@ -8,8 +8,7 @@ import time
 import base64
 import io
 import time
-import requests
-import json
+import re
 
 import dash
 import dash_bootstrap_components as dbc
@@ -277,8 +276,7 @@ def formatting_consumption_data(dataset):
 # - UPDATE SU GCP
 def gcp_update_tab_consumi(df):
     # Imposta il percorso del file JSON di credenziali
-
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/etc/secrets/solar-api-399515-da9f8b1998a8.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "solar-api-399515-da9f8b1998a8.json"
     print(df.columns)
     # Crea un client BigQuery
     client = bigquery.Client()
@@ -365,7 +363,7 @@ def heatmap_trace(df):
         y=heatmap_data.index,
         colorscale='YlOrRd',
         colorbar=dict(
-            len=0.47,  # Lunghezza della colorbar
+            len=0.42,  # Lunghezza della colorbar
             lenmode='fraction',  # Lunghezza in termini di frazione dell'altezza totale
             y=0.2,  # Posiziona il centro della colorbar a metà dell'altezza del grafico
             yanchor='middle',  # L'ancoraggio 'middle' allinea il centro della colorbar con y
@@ -394,7 +392,7 @@ def report_subplot(df):
     fig.add_trace(heatmap_tr, row=2, col=1)
 
     # Aggiornamento del layout per ridurre i margini
-    fig.update_layout(title_text="Analisi dei Consumi Energetici", height=1000, width=1700,
+    fig.update_layout(title_text="", height=1000, width=1200,
                       margin=dict(l=10, r=10, t=30, b=10))  # Margini più stretti
 
     # Opzionale: aggiornamento del padding all'interno di ciascun subplot, se necessario
@@ -411,10 +409,9 @@ def report_subplot(df):
 
 
 
-# Inizializza l'applicazione Dash
+# Inizializza l'applicazione Dash con il tema Bootstrap
 app = dash.Dash(__name__)
 server = app.server
-
 
 
 # Definizione degli stili (come da tuo codice)
@@ -426,7 +423,7 @@ stile_giallo = {
 }
 
 stile_input = {
-    'width': '40%',
+    'width': '60%',
     'height': '50px',
     'margin': '5px',
     'borderRadius': '10px',
@@ -469,6 +466,26 @@ form_layout = html.Div([
                             dcc.Input(id='distributore', type='text', placeholder='Distributore', style=stile_input),
                             html.Br(),
 
+                            dcc.RadioItems(
+                                options=[
+                                    {'label': 'Producer', 'value': 'Producer'},
+                                    {'label': 'Consumer', 'value': 'Consumer'},
+                                    {'label': 'Prosumer', 'value': 'Prosumer'}
+                                ],
+                                value='Producer',
+                                id='role',
+                                style={'display': 'flex',
+                                       'justifyContent': 'center',
+                                       'fontSize': '20px',  # Aumenta la dimensione del testo
+                                       'margin': '10px 0'  # Aumenta il margine verticale
+                                       },
+                                labelStyle={'display': 'inline-block',
+                                            'marginRight': '20px',  # Aumenta lo spazio tra le etichette
+                                            'cursor': 'pointer'}  # Aggiunge stile al puntatore
+                            ),
+
+
+
                             #Drag and Drop
                             dcc.Upload(
                                 id='upload-data',
@@ -498,13 +515,6 @@ form_layout = html.Div([
                         html.Br(),
 
                         #Output area
-                        dcc.Loading(
-                            dcc.Textarea(
-                                id='output-data-upload',
-                                value='Risultati dell\'upload e dati del form verranno visualizzati qui',
-                                style={'width': '90%', 'height': '300px', 'margin': '10px auto'}
-                            )
-                        ),
 
 
                     ], style=stile_giallo)
@@ -529,7 +539,7 @@ app.layout = html.Div([
 ###############################################
 # Callback Tabella Iscritti
 @app.callback(
-    [Output('output-data-upload', 'value'),
+    [#Output('output-data-upload', 'value'),
      Output('store-id-pod', 'data')],
     [Input('submit-button', 'n_clicks')],
     [
@@ -548,17 +558,18 @@ def update_tabella_iscritti(n_clicks, id_pod, nome, cognome, azienda, ambito, su
     if n_clicks > 0:
         time.sleep(1)  # Simula il tempo di elaborazione
 
+        '''
         output_text = (f'DATI INSERITI:\nID_POD: {id_pod}\nNome: {nome}\nCognome: {cognome}\n'
                        f'Azienda: {azienda}\nAmbito: {ambito}\nSuperficie tetto: {superficie_tetto}\n'
                        f'Dipendenti: {dipendenti}\nLocalità: {localita}\nDistributore: {distributore}')
-
+        '''
 
 
     else:
         output_text = "Inserisci i dati del form"
 
     # Restituisce sia il testo per l'output che i dati da memorizzare in dcc.Store
-    return output_text, {'id_pod': id_pod}
+    return [{'id_pod': id_pod}]
 
 
 
